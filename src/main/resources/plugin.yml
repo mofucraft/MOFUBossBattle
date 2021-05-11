@@ -1,0 +1,7 @@
+name: MOFUBossBattle
+version: ${project.version}
+main: com.yiorno.mofubossbattle.MOFUBossBattle
+api-version: 1.16
+prefix: MOFUBoss
+depend: [ MythicMobs ]
+authors: [ yossy_zip ]
