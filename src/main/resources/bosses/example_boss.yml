@@ -1,0 +1,88 @@
+# Boss Configuration: Example Boss
+# このファイルをコピーして新しいボスを作成してください
+
+# Internal boss ID (must be unique)
+id: "example_boss"
+
+# Display name for messages (color codes supported)
+display-name: "&c&lドラゴンキング"
+
+# MythicMobs mob ID
+mythic-mob-id: "DragonKing"
+
+# Time limit in seconds (default: 300)
+time-limit: 600
+
+# Item collection time after boss defeat in seconds (default: 30)
+item-collection-time: 45
+
+# Invincibility time at battle start in seconds (optional)
+invincibility-time: 3
+
+# Boss level for MythicMobs (optional, default: 1)
+boss-level: 1
+
+# Locations
+locations:
+  # Where player teleports when battle starts
+  teleport:
+    world: "world"
+    x: 100.5
+    y: 65.0
+    z: 200.5
+    yaw: 0.0
+    pitch: 0.0
+
+  # Pre-battle waiting location (optional)
+  waiting:
+    world: "world"
+    x: 95.5
+    y: 65.0
+    z: 195.5
+    yaw: 0.0
+    pitch: 0.0
+
+  # Where boss spawns
+  boss-spawn:
+    world: "world"
+    x: 100.5
+    y: 65.0
+    z: 220.5
+    yaw: 180.0
+    pitch: 0.0
+
+  # Where player teleports after battle ends
+  exit:
+    world: "world"
+    x: 0.5
+    y: 100.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+
+# Boss-specific messages (optional, overrides defaults)
+messages:
+  start: "&4&l{boss_name}&rが目覚めた... 覚悟しろ！"
+  victory: "&6圧倒的な勝利！&e{boss_name}&rを&a{time}&rで打ち倒した！"
+  defeat: "&4{boss_name}&rの炎に焼き尽くされた..."
+  timeout: "&4時間切れ... {boss_name}&rは逃げ去った..."
+
+# Time warning configuration
+# Format: seconds_remaining: "message"
+time-warnings:
+  300: "&e残り&c5分&r！"
+  180: "&e残り&c3分&r！"
+  60: "&c&l残り1分！&r急げ！"
+  30: "&4&l残り30秒！！"
+  10: "&4&l&n残り10秒！！！"
+
+# Commands to execute when boss is defeated
+# Placeholders: {player}, {boss_id}, {boss_name}, {time}, {time_ms}
+victory-commands:
+  - "give {player} diamond 5"
+  - "eco give {player} 10000"
+  - "say {player}が{boss_name}を{time}で討伐！"
+
+# Commands to execute when player fails (death/timeout/logout)
+defeat-commands:
+  - "say {player}は{boss_name}に敗北した..."

@@ -1,0 +1,42 @@
+# MofuBossBattle Message Configuration
+
+# Prefix for messages
+prefix: "&8[&6MofuBossBattle&8] "
+
+# Battle messages
+battle:
+  start: "&a{boss_name}&rとの戦闘を開始します！"
+  victory: "&6おめでとう！ &e{boss_name}&rを&a{time}&rで討伐しました！"
+  defeat: "&c{boss_name}&rに敗北しました..."
+  timeout: "&c時間切れ！{boss_name}&rとの戦闘に失敗しました。"
+  logout: "&c{player}&rがログアウトしたため、戦闘が終了しました。"
+
+# Time warning messages (default)
+time-warnings:
+  default: "&e残り時間: &c{time}秒"
+
+# Item collection phase messages
+item-collection:
+  start: "&aボスを討伐しました！&e{time}秒&r以内にアイテムを回収してください。"
+  warning: "&e残り&c{time}秒&rでアイテム回収時間が終了します。"
+  end: "&rアイテム回収時間が終了しました。"
+
+# Ranking messages
+ranking:
+  header: "&6=== {boss_name} ランキング ==="
+  entry: "&e{rank}. &f{player} &7- &a{time}"
+  no-records: "&7まだ記録がありません。"
+  your-rank: "&eあなたの順位: &f{rank}位 &7(&a{time}&7)"
+  not-ranked: "&7あなたはまだランキングに登録されていません。"
+
+# Command messages
+command:
+  no-permission: "&cこのコマンドを実行する権限がありません。"
+  player-only: "&cこのコマンドはプレイヤーのみ実行できます。"
+  invalid-boss: "&c指定されたボスが見つかりません: {boss}"
+  already-in-battle: "&cすでにボス戦に参加しています。"
+  battle-started: "&a{player}が{boss_name}との戦闘を開始しました。"
+  battle-stopped: "&eボス戦を強制終了しました。"
+  config-reloaded: "&a設定を再読み込みしました。"
+  not-in-battle: "&cボス戦に参加していません。"
+  boss-list: "&6利用可能なボス: &f{bosses}"

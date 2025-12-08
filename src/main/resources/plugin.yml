@@ -1,0 +1,63 @@
+name: MofuBossBattle
+version: '${version}'
+main: net.mofucraft.bossbattle.MofuBossBattle
+api-version: '1.21'
+authors:
+  - MofuCraft
+description: A boss battle management plugin with rankings and MythicMobs integration
+
+softdepend:
+  - MythicMobs
+  - PlaceholderAPI
+
+commands:
+  boss:
+    description: Main boss battle command
+    usage: /<command> <start|stop|list|ranking|myrank|reload|help>
+    permission: mofubossbattle.use
+
+permissions:
+  mofubossbattle.use:
+    description: Allows basic boss battle commands
+    default: true
+  mofubossbattle.start:
+    description: Allows starting boss battles
+    default: true
+  mofubossbattle.start.others:
+    description: Allows starting boss battles for other players
+    default: op
+  mofubossbattle.stop:
+    description: Allows stopping own boss battles
+    default: true
+  mofubossbattle.stop.others:
+    description: Allows stopping other players' battles
+    default: op
+  mofubossbattle.list:
+    description: Allows listing available bosses
+    default: true
+  mofubossbattle.ranking:
+    description: Allows viewing rankings
+    default: true
+  mofubossbattle.myrank:
+    description: Allows viewing own rank
+    default: true
+  mofubossbattle.reload:
+    description: Allows reloading configuration
+    default: op
+  mofubossbattle.admin:
+    description: Full admin access
+    default: op
+  mofubossbattle.*:
+    description: All permissions
+    default: op
+    children:
+      mofubossbattle.use: true
+      mofubossbattle.start: true
+      mofubossbattle.start.others: true
+      mofubossbattle.stop: true
+      mofubossbattle.stop.others: true
+      mofubossbattle.list: true
+      mofubossbattle.ranking: true
+      mofubossbattle.myrank: true
+      mofubossbattle.reload: true
+      mofubossbattle.admin: true

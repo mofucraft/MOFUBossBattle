@@ -1,0 +1,27 @@
+# MofuBossBattle Configuration
+
+# Database settings (MySQL)
+database:
+  host: "localhost"
+  port: 3306
+  database: "mofubossbattle"
+  username: "root"
+  password: "password"
+  pool-size: 10
+
+# Global settings
+settings:
+  # Prefix for all plugin messages
+  prefix: "&8[&6MofuBossBattle&8] "
+
+  # Default time limit if not specified per boss (seconds)
+  default-time-limit: 300
+
+  # Default item collection time after boss defeat (seconds)
+  default-item-collection-time: 30
+
+  # Allow players to start boss battles
+  enabled: true
+
+# Debug mode - enables verbose logging
+debug: false
