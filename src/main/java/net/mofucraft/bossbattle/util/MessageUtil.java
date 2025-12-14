@@ -31,9 +31,25 @@ public final class MessageUtil {
         }
         String processed = message;
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            processed = processed.replace("{" + entry.getKey() + "}", entry.getValue());
+            // Add reset code after placeholder value to prevent color bleeding
+            String value = entry.getValue();
+            if (value != null && value.contains("&")) {
+                value = value + "&r";
+            }
+            processed = processed.replace("{" + entry.getKey() + "}", value != null ? value : "");
         }
         return parse(processed);
+    }
+
+    /**
+     * Strip color codes from a string
+     */
+    public static String stripColors(String message) {
+        if (message == null) {
+            return null;
+        }
+        // Remove legacy color codes (&x, §x)
+        return message.replaceAll("[&§][0-9a-fk-or]", "");
     }
 
     public static void sendMessage(Player player, String message) {

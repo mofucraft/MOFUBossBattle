@@ -22,6 +22,10 @@ invincibility-time: 3
 # Boss level for MythicMobs (optional, default: 1)
 boss-level: 1
 
+# Boss spawn delay in ticks (20 ticks = 1 second, default: 20)
+# Allows chunk to load after player teleport before spawning boss
+boss-spawn-delay: 20
+
 # Locations
 locations:
   # Where player teleports when battle starts
@@ -66,6 +70,9 @@ messages:
   victory: "&6圧倒的な勝利！&e{boss_name}&rを&a{time}&rで打ち倒した！"
   defeat: "&4{boss_name}&rの炎に焼き尽くされた..."
   timeout: "&4時間切れ... {boss_name}&rは逃げ去った..."
+  # Broadcast messages sent to all online players (optional)
+  victory-broadcast: "&6【討伐速報】&e{player}&rが&c{boss_name}&rを&a{time}&rで討伐しました！"
+  defeat-broadcast: ""
 
 # Time warning configuration
 # Format: seconds_remaining: "message"

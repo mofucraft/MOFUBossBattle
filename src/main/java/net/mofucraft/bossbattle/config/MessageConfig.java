@@ -175,6 +175,10 @@ public class MessageConfig {
         return prefix;
     }
 
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
     public String withPrefix(String message) {
         return prefix + message;
     }

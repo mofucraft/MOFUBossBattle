@@ -17,7 +17,7 @@ public class BossTabCompleter implements TabCompleter {
 
     private final MofuBossBattle plugin;
     private static final List<String> SUBCOMMANDS = Arrays.asList(
-            "start", "stop", "list", "ranking", "myrank", "reload", "help"
+            "start", "stop", "list", "ranking", "myrank", "resetranking", "reload", "help"
     );
 
     public BossTabCompleter(MofuBossBattle plugin) {
@@ -56,6 +56,13 @@ public class BossTabCompleter implements TabCompleter {
                                 .collect(Collectors.toList());
                     }
                     break;
+                case "resetranking":
+                    if (sender.hasPermission("mofubossbattle.admin")) {
+                        completions = Arrays.asList("boss", "player").stream()
+                                .filter(s -> s.startsWith(input))
+                                .collect(Collectors.toList());
+                    }
+                    break;
             }
         } else if (args.length == 3) {
             String subCommand = args[0].toLowerCase();
@@ -65,6 +72,30 @@ public class BossTabCompleter implements TabCompleter {
                 completions = Bukkit.getOnlinePlayers().stream()
                         .map(Player::getName)
                         .filter(name -> name.toLowerCase().startsWith(input))
+                        .collect(Collectors.toList());
+            } else if (subCommand.equals("resetranking") && sender.hasPermission("mofubossbattle.admin")) {
+                String type = args[1].toLowerCase();
+                if (type.equals("boss")) {
+                    completions = plugin.getConfigManager().getAllBossConfigs().stream()
+                            .map(BossConfig::getId)
+                            .filter(id -> id.toLowerCase().startsWith(input))
+                            .collect(Collectors.toList());
+                } else if (type.equals("player")) {
+                    completions = Bukkit.getOnlinePlayers().stream()
+                            .map(Player::getName)
+                            .filter(name -> name.toLowerCase().startsWith(input))
+                            .collect(Collectors.toList());
+                }
+            }
+        } else if (args.length == 4) {
+            String subCommand = args[0].toLowerCase();
+            String type = args[1].toLowerCase();
+            String input = args[3].toLowerCase();
+
+            if (subCommand.equals("resetranking") && type.equals("player") && sender.hasPermission("mofubossbattle.admin")) {
+                completions = plugin.getConfigManager().getAllBossConfigs().stream()
+                        .map(BossConfig::getId)
+                        .filter(id -> id.toLowerCase().startsWith(input))
                         .collect(Collectors.toList());
             }
         }
@@ -79,6 +110,7 @@ public class BossTabCompleter implements TabCompleter {
             case "list" -> sender.hasPermission("mofubossbattle.list");
             case "ranking" -> sender.hasPermission("mofubossbattle.ranking");
             case "myrank" -> sender.hasPermission("mofubossbattle.myrank");
+            case "resetranking" -> sender.hasPermission("mofubossbattle.admin");
             case "reload" -> sender.hasPermission("mofubossbattle.reload");
             default -> true;
         };

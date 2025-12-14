@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BossCommand implements CommandExecutor {
@@ -49,6 +50,8 @@ public class BossCommand implements CommandExecutor {
                 return handleRanking(sender, args, messages);
             case "myrank":
                 return handleMyRank(sender, args, messages);
+            case "resetranking":
+                return handleResetRanking(sender, args, messages);
             case "reload":
                 return handleReload(sender, messages);
             case "help":
@@ -291,6 +294,86 @@ public class BossCommand implements CommandExecutor {
         return true;
     }
 
+    private boolean handleResetRanking(CommandSender sender, String[] args, MessageConfig messages) {
+        if (!sender.hasPermission("mofubossbattle.admin")) {
+            if (sender instanceof Player) {
+                MessageUtil.sendMessage((Player) sender, messages.withPrefix(messages.getCommandNoPermission()));
+            } else {
+                sender.sendMessage("You don't have permission to use this command.");
+            }
+            return true;
+        }
+
+        if (args.length < 3) {
+            sender.sendMessage("Usage: /boss resetranking <boss|player> <boss_id|player_name> [boss_id]");
+            sender.sendMessage("  /boss resetranking boss <boss_id> - Reset all rankings for a boss");
+            sender.sendMessage("  /boss resetranking player <player_name> [boss_id] - Reset player rankings");
+            return true;
+        }
+
+        String type = args[1].toLowerCase();
+        String target = args[2];
+
+        if (type.equals("boss")) {
+            if (!plugin.getConfigManager().hasBoss(target)) {
+                sender.sendMessage("§cBoss not found: " + target);
+                return true;
+            }
+
+            plugin.getRankingRepository().resetBossRankings(target).thenAccept(count -> {
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    sender.sendMessage("§a" + target + " のランキングをリセットしました。(" + count + "件削除)");
+                });
+            });
+        } else if (type.equals("player")) {
+            Player targetPlayer = Bukkit.getPlayer(target);
+            UUID targetUuid;
+            String targetName;
+
+            if (targetPlayer != null) {
+                targetUuid = targetPlayer.getUniqueId();
+                targetName = targetPlayer.getName();
+            } else {
+                // Try to get offline player
+                @SuppressWarnings("deprecation")
+                org.bukkit.OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(target);
+                if (offlinePlayer.hasPlayedBefore() || offlinePlayer.isOnline()) {
+                    targetUuid = offlinePlayer.getUniqueId();
+                    targetName = offlinePlayer.getName() != null ? offlinePlayer.getName() : target;
+                } else {
+                    sender.sendMessage("§cPlayer not found: " + target);
+                    return true;
+                }
+            }
+
+            if (args.length >= 4) {
+                // Reset specific boss ranking for player
+                String bossId = args[3];
+                if (!plugin.getConfigManager().hasBoss(bossId)) {
+                    sender.sendMessage("§cBoss not found: " + bossId);
+                    return true;
+                }
+
+                plugin.getRankingRepository().resetPlayerRankings(targetUuid, bossId).thenAccept(count -> {
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        sender.sendMessage("§a" + targetName + " の " + bossId + " ランキングをリセットしました。(" + count + "件削除)");
+                    });
+                });
+            } else {
+                // Reset all rankings for player
+                plugin.getRankingRepository().resetAllPlayerRankings(targetUuid).thenAccept(count -> {
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        sender.sendMessage("§a" + targetName + " の全ランキングをリセットしました。(" + count + "件削除)");
+                    });
+                });
+            }
+        } else {
+            sender.sendMessage("§cInvalid type. Use 'boss' or 'player'.");
+        }
+
+        return true;
+    }
+
     private boolean handleReload(CommandSender sender, MessageConfig messages) {
         if (!sender.hasPermission("mofubossbattle.reload")) {
             if (sender instanceof Player) {
@@ -317,6 +400,7 @@ public class BossCommand implements CommandExecutor {
         sender.sendMessage("§e/boss list §7- List available bosses");
         sender.sendMessage("§e/boss ranking <boss_id> §7- View rankings");
         sender.sendMessage("§e/boss myrank <boss_id> §7- View your rank");
+        sender.sendMessage("§e/boss resetranking <boss|player> <id> §7- Reset rankings (Admin)");
         sender.sendMessage("§e/boss reload §7- Reload configuration");
         sender.sendMessage("§e/boss help §7- Show this help");
     }

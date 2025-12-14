@@ -175,4 +175,53 @@ public class RankingRepository {
             return 0;
         });
     }
+
+    public CompletableFuture<Integer> resetPlayerRankings(UUID playerId, String bossId) {
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "DELETE FROM boss_rankings WHERE player_uuid = ? AND boss_id = ?";
+
+            try (Connection conn = databaseManager.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, playerId.toString());
+                stmt.setString(2, bossId);
+                return stmt.executeUpdate();
+            } catch (SQLException e) {
+                MofuBossBattle.getInstance().getLogger().log(Level.WARNING, "Failed to reset player rankings", e);
+            }
+
+            return 0;
+        });
+    }
+
+    public CompletableFuture<Integer> resetBossRankings(String bossId) {
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "DELETE FROM boss_rankings WHERE boss_id = ?";
+
+            try (Connection conn = databaseManager.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, bossId);
+                return stmt.executeUpdate();
+            } catch (SQLException e) {
+                MofuBossBattle.getInstance().getLogger().log(Level.WARNING, "Failed to reset boss rankings", e);
+            }
+
+            return 0;
+        });
+    }
+
+    public CompletableFuture<Integer> resetAllPlayerRankings(UUID playerId) {
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "DELETE FROM boss_rankings WHERE player_uuid = ?";
+
+            try (Connection conn = databaseManager.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, playerId.toString());
+                return stmt.executeUpdate();
+            } catch (SQLException e) {
+                MofuBossBattle.getInstance().getLogger().log(Level.WARNING, "Failed to reset all player rankings", e);
+            }
+
+            return 0;
+        });
+    }
 }

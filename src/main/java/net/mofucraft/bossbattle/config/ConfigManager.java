@@ -29,6 +29,7 @@ public class ConfigManager {
     private int dbPoolSize;
 
     // Global settings
+    private String prefix;
     private int defaultTimeLimit;
     private int defaultItemCollectionTime;
     private boolean enabled;
@@ -71,6 +72,7 @@ public class ConfigManager {
         dbPoolSize = config.getInt("database.pool-size", 10);
 
         // Global settings
+        prefix = config.getString("settings.prefix", "&8[&6MofuBossBattle&8] ");
         defaultTimeLimit = config.getInt("settings.default-time-limit", 300);
         defaultItemCollectionTime = config.getInt("settings.default-item-collection-time", 30);
         enabled = config.getBoolean("settings.enabled", true);
@@ -94,6 +96,11 @@ public class ConfigManager {
         }
 
         messageConfig.load(messagesConfig);
+
+        // Override prefix from config.yml if set
+        if (prefix != null && !prefix.isEmpty()) {
+            messageConfig.setPrefix(prefix);
+        }
     }
 
     private void loadBossConfigs() {

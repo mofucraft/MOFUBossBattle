@@ -51,21 +51,28 @@ public class BattleManager {
             player.teleport(teleportLoc);
         }
 
-        // Spawn boss via MythicMobs
+        // Start battle (timer starts now)
+        session.start();
+
+        // Spawn boss via MythicMobs with delay for chunk loading
+        int spawnDelay = bossConfig.getBossSpawnDelay();
         if (plugin.getMythicMobsHook() != null) {
             Location bossSpawnLoc = bossConfig.getBossSpawnLocation();
             if (bossSpawnLoc != null) {
-                UUID mobUuid = plugin.getMythicMobsHook().spawnBoss(
-                        bossConfig.getMythicMobId(),
-                        bossSpawnLoc,
-                        bossConfig.getBossLevel()
-                );
-                session.setActiveMobUuid(mobUuid);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    // Check if session is still active
+                    if (!session.isActive()) {
+                        return;
+                    }
+                    UUID mobUuid = plugin.getMythicMobsHook().spawnBoss(
+                            bossConfig.getMythicMobId(),
+                            bossSpawnLoc,
+                            bossConfig.getBossLevel()
+                    );
+                    session.setActiveMobUuid(mobUuid);
+                }, spawnDelay);
             }
         }
-
-        // Start battle
-        session.start();
 
         // Send start message
         MessageConfig messages = plugin.getConfigManager().getMessageConfig();
@@ -146,6 +153,12 @@ public class BattleManager {
         placeholders.put("time_ms", String.valueOf(clearTime));
 
         MessageUtil.sendMessage(player, messages.withPrefix(victoryMsg), placeholders);
+
+        // Send victory broadcast
+        String victoryBroadcast = bossConfig.getVictoryBroadcast();
+        if (victoryBroadcast != null && !victoryBroadcast.isEmpty()) {
+            broadcastMessage(victoryBroadcast, placeholders);
+        }
 
         // Start item collection phase
         int collectionTime = bossConfig.getItemCollectionTime();
@@ -258,6 +271,12 @@ public class BattleManager {
             }
         }
 
+        // Send defeat broadcast
+        String defeatBroadcast = bossConfig.getDefeatBroadcast();
+        if (defeatBroadcast != null && !defeatBroadcast.isEmpty()) {
+            broadcastMessage(defeatBroadcast, placeholders);
+        }
+
         endBattle(playerId, BattleState.FAILED);
 
         if (plugin.getConfigManager().isDebug()) {
@@ -348,5 +367,11 @@ public class BattleManager {
 
     public Map<UUID, BattleSession> getActiveBattles() {
         return new HashMap<>(activeBattles);
+    }
+
+    private void broadcastMessage(String message, Map<String, String> placeholders) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            MessageUtil.sendMessage(p, message, placeholders);
+        }
     }
 }

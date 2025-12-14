@@ -18,6 +18,7 @@ public class BossConfig {
     private int itemCollectionTime;
     private int invincibilityTime;
     private int bossLevel;
+    private int bossSpawnDelay;
 
     // Locations
     private Location teleportLocation;
@@ -30,6 +31,8 @@ public class BossConfig {
     private String victoryMessage;
     private String defeatMessage;
     private String timeoutMessage;
+    private String victoryBroadcast;
+    private String defeatBroadcast;
     private Map<Integer, String> timeWarnings;
 
     // Commands
@@ -54,6 +57,7 @@ public class BossConfig {
         boss.itemCollectionTime = config.getInt("item-collection-time", 30);
         boss.invincibilityTime = config.getInt("invincibility-time", 0);
         boss.bossLevel = config.getInt("boss-level", 1);
+        boss.bossSpawnDelay = config.getInt("boss-spawn-delay", 20);
 
         // Load locations
         ConfigurationSection locationsSection = config.getConfigurationSection("locations");
@@ -71,6 +75,8 @@ public class BossConfig {
             boss.victoryMessage = messagesSection.getString("victory");
             boss.defeatMessage = messagesSection.getString("defeat");
             boss.timeoutMessage = messagesSection.getString("timeout");
+            boss.victoryBroadcast = messagesSection.getString("victory-broadcast");
+            boss.defeatBroadcast = messagesSection.getString("defeat-broadcast");
         }
 
         // Load time warnings
@@ -124,6 +130,10 @@ public class BossConfig {
         return bossLevel;
     }
 
+    public int getBossSpawnDelay() {
+        return bossSpawnDelay;
+    }
+
     public Location getTeleportLocation() {
         return teleportLocation;
     }
@@ -154,6 +164,14 @@ public class BossConfig {
 
     public String getTimeoutMessage() {
         return timeoutMessage;
+    }
+
+    public String getVictoryBroadcast() {
+        return victoryBroadcast;
+    }
+
+    public String getDefeatBroadcast() {
+        return defeatBroadcast;
     }
 
     public Map<Integer, String> getTimeWarnings() {

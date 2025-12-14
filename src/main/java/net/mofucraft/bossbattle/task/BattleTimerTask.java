@@ -3,7 +3,6 @@ package net.mofucraft.bossbattle.task;
 import net.mofucraft.bossbattle.MofuBossBattle;
 import net.mofucraft.bossbattle.battle.BattleSession;
 import net.mofucraft.bossbattle.config.BossConfig;
-import net.mofucraft.bossbattle.config.MessageConfig;
 import net.mofucraft.bossbattle.util.MessageUtil;
 import net.mofucraft.bossbattle.util.TimeUtil;
 import org.bukkit.Bukkit;
@@ -62,14 +61,5 @@ public class BattleTimerTask extends BukkitRunnable {
 
             MessageUtil.sendMessage(player, warningMessage, placeholders);
         }
-
-        // Show action bar with remaining time
-        MessageConfig messages = plugin.getConfigManager().getMessageConfig();
-        Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("time", String.valueOf(remainingSeconds));
-        placeholders.put("time_formatted", TimeUtil.formatSecondsReadable(remainingSeconds));
-        placeholders.put("boss_name", bossConfig.getDisplayName());
-
-        MessageUtil.sendActionBar(player, messages.getTimeWarningDefault(), placeholders);
     }
 }
