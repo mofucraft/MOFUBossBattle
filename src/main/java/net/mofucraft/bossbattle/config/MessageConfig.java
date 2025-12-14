@@ -10,6 +10,7 @@ public class MessageConfig {
     private String battleDefeat;
     private String battleTimeout;
     private String battleLogout;
+    private String battleBossRemoved;
 
     // Time warnings
     private String timeWarningDefault;
@@ -47,6 +48,7 @@ public class MessageConfig {
         battleDefeat = config.getString("battle.defeat", "&c{boss_name}&rに敗北しました...");
         battleTimeout = config.getString("battle.timeout", "&c時間切れ！{boss_name}&rとの戦闘に失敗しました。");
         battleLogout = config.getString("battle.logout", "&c{player}&rがログアウトしたため、戦闘が終了しました。");
+        battleBossRemoved = config.getString("battle.boss-removed", "&c{boss_name}&rが消滅したため、戦闘が終了しました。");
 
         // Time warnings
         timeWarningDefault = config.getString("time-warnings.default", "&e残り時間: &c{time}秒");
@@ -56,8 +58,8 @@ public class MessageConfig {
         itemCollectionWarning = config.getString("item-collection.warning", "&e残り&c{time}秒&rでアイテム回収時間が終了します。");
         itemCollectionEnd = config.getString("item-collection.end", "&rアイテム回収時間が終了しました。");
 
-        // Ranking
-        rankingHeader = config.getString("ranking.header", "&6=== {boss_name} ランキング ===");
+        // Ranking (use {boss_name_plain} for color-stripped name, {boss_name} for colored)
+        rankingHeader = config.getString("ranking.header", "&6=== {boss_name_plain} ランキング ===");
         rankingEntry = config.getString("ranking.entry", "&e{rank}. &f{player} &7- &a{time}");
         rankingNoRecords = config.getString("ranking.no-records", "&7まだ記録がありません。");
         rankingYourRank = config.getString("ranking.your-rank", "&eあなたの順位: &f{rank}位 &7(&a{time}&7)");
@@ -97,6 +99,10 @@ public class MessageConfig {
 
     public String getBattleLogout() {
         return battleLogout;
+    }
+
+    public String getBattleBossRemoved() {
+        return battleBossRemoved;
     }
 
     public String getTimeWarningDefault() {

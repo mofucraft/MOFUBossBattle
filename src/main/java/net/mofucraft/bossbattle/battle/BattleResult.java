@@ -9,7 +9,8 @@ public class BattleResult {
         VICTORY,
         DEFEAT,
         TIMEOUT,
-        LOGOUT
+        LOGOUT,
+        BOSS_REMOVED
     }
 
     private final UUID playerId;

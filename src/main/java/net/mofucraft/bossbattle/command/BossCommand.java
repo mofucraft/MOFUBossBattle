@@ -226,6 +226,7 @@ public class BossCommand implements CommandExecutor {
 
                 Map<String, String> headerPlaceholders = new HashMap<>();
                 headerPlaceholders.put("boss_name", bossConfig.getDisplayName());
+                headerPlaceholders.put("boss_name_plain", MessageUtil.stripColors(bossConfig.getDisplayName()));
                 headerPlaceholders.put("page", String.valueOf(finalPage));
 
                 if (sender instanceof Player) {

@@ -26,6 +26,10 @@ boss-level: 1
 # Allows chunk to load after player teleport before spawning boss
 boss-spawn-delay: 20
 
+# Blindness duration in seconds when player teleports (default: 0 = disabled)
+# Useful for dramatic effect and to hide chunk loading
+teleport-blindness-duration: 2
+
 # Locations
 locations:
   # Where player teleports when battle starts

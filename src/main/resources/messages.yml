@@ -10,6 +10,7 @@ battle:
   defeat: "&c{boss_name}&rに敗北しました..."
   timeout: "&c時間切れ！{boss_name}&rとの戦闘に失敗しました。"
   logout: "&c{player}&rがログアウトしたため、戦闘が終了しました。"
+  boss-removed: "&c{boss_name}&rが消滅したため、戦闘が終了しました。"
 
 # Time warning messages (default)
 time-warnings:
@@ -22,8 +23,9 @@ item-collection:
   end: "&rアイテム回収時間が終了しました。"
 
 # Ranking messages
+# Use {boss_name_plain} for color-stripped name, {boss_name} for colored name
 ranking:
-  header: "&6=== {boss_name} ランキング ==="
+  header: "&6=== {boss_name_plain} ランキング ==="
   entry: "&e{rank}. &f{player} &7- &a{time}"
   no-records: "&7まだ記録がありません。"
   your-rank: "&eあなたの順位: &f{rank}位 &7(&a{time}&7)"

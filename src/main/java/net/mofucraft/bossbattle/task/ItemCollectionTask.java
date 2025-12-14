@@ -73,11 +73,5 @@ public class ItemCollectionTask extends BukkitRunnable {
 
             MessageUtil.sendMessage(player, messages.withPrefix(messages.getItemCollectionWarning()), placeholders);
         }
-
-        // Show action bar
-        Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("time", String.valueOf(remainingSeconds));
-
-        MessageUtil.sendActionBar(player, "&eアイテム回収中... 残り&c" + remainingSeconds + "秒", placeholders);
     }
 }

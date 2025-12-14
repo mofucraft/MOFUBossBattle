@@ -10,6 +10,8 @@ import net.mofucraft.bossbattle.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +51,18 @@ public class BattleManager {
         Location teleportLoc = bossConfig.getTeleportLocation();
         if (teleportLoc != null) {
             player.teleport(teleportLoc);
+
+            // Apply blindness effect if configured
+            int blindnessDuration = bossConfig.getTeleportBlindnessDuration();
+            if (blindnessDuration > 0) {
+                player.addPotionEffect(new PotionEffect(
+                        PotionEffectType.BLINDNESS,
+                        blindnessDuration * 20, // Convert seconds to ticks
+                        0,
+                        false,
+                        false
+                ));
+            }
         }
 
         // Start battle (timer starts now)
@@ -205,7 +219,7 @@ public class BattleManager {
         handleBattleFailure(playerId, BattleResult.ResultType.TIMEOUT);
     }
 
-    private void handleBattleFailure(UUID playerId, BattleResult.ResultType resultType) {
+    public void handleBattleFailure(UUID playerId, BattleResult.ResultType resultType) {
         BattleSession session = activeBattles.get(playerId);
         if (session == null) {
             return;
@@ -220,9 +234,11 @@ public class BattleManager {
         // Cancel tasks
         session.cancelTasks();
 
-        // Remove spawned boss
-        if (plugin.getMythicMobsHook() != null && session.getActiveMobUuid() != null) {
-            plugin.getMythicMobsHook().removeMob(session.getActiveMobUuid());
+        // Remove spawned boss (skip if already removed)
+        if (resultType != BattleResult.ResultType.BOSS_REMOVED) {
+            if (plugin.getMythicMobsHook() != null && session.getActiveMobUuid() != null) {
+                plugin.getMythicMobsHook().removeMob(session.getActiveMobUuid());
+            }
         }
 
         // Save battle history
@@ -250,6 +266,9 @@ public class BattleManager {
                 break;
             case LOGOUT:
                 message = messages.getBattleLogout();
+                break;
+            case BOSS_REMOVED:
+                message = messages.getBattleBossRemoved();
                 break;
             default:
                 message = bossConfig.getDefeatMessage();

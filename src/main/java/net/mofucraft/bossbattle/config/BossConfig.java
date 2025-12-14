@@ -19,6 +19,7 @@ public class BossConfig {
     private int invincibilityTime;
     private int bossLevel;
     private int bossSpawnDelay;
+    private int teleportBlindnessDuration;
 
     // Locations
     private Location teleportLocation;
@@ -58,6 +59,7 @@ public class BossConfig {
         boss.invincibilityTime = config.getInt("invincibility-time", 0);
         boss.bossLevel = config.getInt("boss-level", 1);
         boss.bossSpawnDelay = config.getInt("boss-spawn-delay", 20);
+        boss.teleportBlindnessDuration = config.getInt("teleport-blindness-duration", 0);
 
         // Load locations
         ConfigurationSection locationsSection = config.getConfigurationSection("locations");
@@ -132,6 +134,10 @@ public class BossConfig {
 
     public int getBossSpawnDelay() {
         return bossSpawnDelay;
+    }
+
+    public int getTeleportBlindnessDuration() {
+        return teleportBlindnessDuration;
     }
 
     public Location getTeleportLocation() {

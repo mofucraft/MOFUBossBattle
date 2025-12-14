@@ -1,7 +1,9 @@
 package net.mofucraft.bossbattle.listener;
 
 import io.lumine.mythic.bukkit.events.MythicMobDeathEvent;
+import io.lumine.mythic.bukkit.events.MythicMobDespawnEvent;
 import net.mofucraft.bossbattle.MofuBossBattle;
+import net.mofucraft.bossbattle.battle.BattleResult;
 import net.mofucraft.bossbattle.battle.BattleSession;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -39,6 +41,27 @@ public class MythicMobListener implements Listener {
                 // Trigger victory
                 plugin.getBattleManager().onBossDefeated(session.getPlayerId());
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMythicMobDespawn(MythicMobDespawnEvent event) {
+        Entity entity = event.getEntity();
+        UUID mobUuid = entity.getUniqueId();
+
+        // Find the battle session for this mob
+        BattleSession session = plugin.getBattleManager().getSessionByMobUuid(mobUuid);
+
+        if (session != null && session.isInBattle()) {
+            if (plugin.getConfigManager().isDebug()) {
+                plugin.getLogger().info("Boss despawned/removed during battle: " + session.getPlayerName());
+            }
+
+            // End battle as failure (boss was removed/despawned)
+            plugin.getBattleManager().handleBattleFailure(
+                    session.getPlayerId(),
+                    BattleResult.ResultType.BOSS_REMOVED
+            );
         }
     }
 }
