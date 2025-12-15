@@ -9,22 +9,28 @@ import net.mofucraft.bossbattle.util.MessageUtil;
 import net.mofucraft.bossbattle.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class BattleManager {
 
     private final MofuBossBattle plugin;
     private final Map<UUID, BattleSession> activeBattles;
+    private final Set<String> activeBosses; // Track which bosses are currently in use
 
     public BattleManager(MofuBossBattle plugin) {
         this.plugin = plugin;
         this.activeBattles = new HashMap<>();
+        this.activeBosses = new HashSet<>();
     }
 
     public boolean startBattle(Player player, String bossId) {
@@ -32,10 +38,18 @@ public class BattleManager {
             return false;
         }
 
+        // Check if another player is already fighting this boss
+        if (isBossInUse(bossId)) {
+            return false;
+        }
+
         BossConfig bossConfig = plugin.getConfigManager().getBossConfig(bossId);
         if (bossConfig == null) {
             return false;
         }
+
+        // Mark boss as in use
+        activeBosses.add(bossId);
 
         // Create session
         BattleSession session = new BattleSession(
@@ -284,19 +298,41 @@ public class BattleManager {
         if (player != null) {
             MessageUtil.sendMessage(player, messages.withPrefix(message), placeholders);
 
-            // Kill player for timeout
+            // Kill player for timeout (damage from boss)
             if (resultType == BattleResult.ResultType.TIMEOUT) {
-                player.setHealth(0);
+                // Try to get boss entity and deal damage from it
+                Entity bossEntity = null;
+                if (plugin.getMythicMobsHook() != null && session.getActiveMobUuid() != null) {
+                    bossEntity = plugin.getMythicMobsHook().getEntity(session.getActiveMobUuid());
+                }
+
+                if (bossEntity instanceof LivingEntity livingBoss) {
+                    // Deal fatal damage from the boss
+                    player.damage(player.getHealth() + 100, livingBoss);
+                } else {
+                    // Fallback: just kill the player
+                    player.setHealth(0);
+                }
             }
         }
 
-        // Send defeat broadcast
-        String defeatBroadcast = bossConfig.getDefeatBroadcast();
-        if (defeatBroadcast != null && !defeatBroadcast.isEmpty()) {
-            broadcastMessage(defeatBroadcast, placeholders);
+        // Send defeat broadcast (not for timeout - timeout has its own message)
+        if (resultType != BattleResult.ResultType.TIMEOUT) {
+            String defeatBroadcast = bossConfig.getDefeatBroadcast();
+            if (defeatBroadcast != null && !defeatBroadcast.isEmpty()) {
+                broadcastMessage(defeatBroadcast, placeholders);
+            }
         }
 
         endBattle(playerId, BattleState.FAILED);
+
+        // Teleport to exit location
+        if (player != null) {
+            Location exitLoc = bossConfig.getExitLocation();
+            if (exitLoc != null) {
+                player.teleport(exitLoc);
+            }
+        }
 
         if (plugin.getConfigManager().isDebug()) {
             plugin.getLogger().info("Battle failed: " + session.getPlayerName() + " - " + resultType.name());
@@ -308,6 +344,9 @@ public class BattleManager {
         if (session == null) {
             return;
         }
+
+        // Release boss for other players
+        activeBosses.remove(session.getBossId());
 
         session.end(endState);
 
@@ -369,6 +408,10 @@ public class BattleManager {
     public boolean isInBattle(UUID playerId) {
         BattleSession session = activeBattles.get(playerId);
         return session != null && session.isActive();
+    }
+
+    public boolean isBossInUse(String bossId) {
+        return activeBosses.contains(bossId);
     }
 
     public BattleSession getSession(UUID playerId) {

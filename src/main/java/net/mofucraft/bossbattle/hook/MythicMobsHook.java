@@ -83,4 +83,16 @@ public class MythicMobsHook {
         }
         return null;
     }
+
+    public Entity getEntity(UUID mobUuid) {
+        try {
+            ActiveMob activeMob = MythicBukkit.inst().getMobManager().getActiveMob(mobUuid).orElse(null);
+            if (activeMob != null && activeMob.getEntity() != null) {
+                return activeMob.getEntity().getBukkitEntity();
+            }
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "Failed to get MythicMob entity: " + mobUuid, e);
+        }
+        return null;
+    }
 }

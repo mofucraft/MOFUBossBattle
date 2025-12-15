@@ -37,6 +37,8 @@ public class MessageConfig {
     private String commandConfigReloaded;
     private String commandNotInBattle;
     private String commandBossList;
+    private String commandBossInUse;
+    private String commandBossDisabled;
 
     // Prefix
     private String prefix;
@@ -75,6 +77,8 @@ public class MessageConfig {
         commandConfigReloaded = config.getString("command.config-reloaded", "&a設定を再読み込みしました。");
         commandNotInBattle = config.getString("command.not-in-battle", "&cボス戦に参加していません。");
         commandBossList = config.getString("command.boss-list", "&6利用可能なボス: &f{bosses}");
+        commandBossInUse = config.getString("command.boss-in-use", "&c{boss_name}&rは現在他のプレイヤーが挑戦中です。");
+        commandBossDisabled = config.getString("command.boss-disabled", "&cこのボスは現在無効化されています: {boss}");
 
         // Prefix
         prefix = config.getString("prefix", "&8[&6MofuBossBattle&8] ");
@@ -175,6 +179,14 @@ public class MessageConfig {
 
     public String getCommandBossList() {
         return commandBossList;
+    }
+
+    public String getCommandBossInUse() {
+        return commandBossInUse;
+    }
+
+    public String getCommandBossDisabled() {
+        return commandBossDisabled;
     }
 
     public String getPrefix() {

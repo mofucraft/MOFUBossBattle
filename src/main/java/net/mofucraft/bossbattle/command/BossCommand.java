@@ -100,16 +100,29 @@ public class BossCommand implements CommandExecutor {
             return true;
         }
 
+        // Check if boss is enabled
+        BossConfig bossConfig = plugin.getConfigManager().getBossConfig(bossId);
+        if (!bossConfig.isEnabled()) {
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("boss", bossId);
+            MessageUtil.sendMessage(target, messages.withPrefix(messages.getCommandBossDisabled()), placeholders);
+            return true;
+        }
+
+        // Check if boss is already in use by another player
+        if (plugin.getBattleManager().isBossInUse(bossId)) {
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("boss_name", bossConfig.getDisplayName());
+            MessageUtil.sendMessage(target, messages.withPrefix(messages.getCommandBossInUse()), placeholders);
+            return true;
+        }
+
         boolean started = plugin.getBattleManager().startBattle(target, bossId);
-        if (started) {
-            BossConfig bossConfig = plugin.getConfigManager().getBossConfig(bossId);
+        if (started && sender != target) {
             Map<String, String> placeholders = new HashMap<>();
             placeholders.put("player", target.getName());
             placeholders.put("boss_name", bossConfig.getDisplayName());
-
-            if (sender != target) {
-                MessageUtil.sendMessage((Player) sender, messages.withPrefix(messages.getCommandBattleStarted()), placeholders);
-            }
+            MessageUtil.sendMessage((Player) sender, messages.withPrefix(messages.getCommandBattleStarted()), placeholders);
         }
 
         return true;

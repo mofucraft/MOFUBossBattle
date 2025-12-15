@@ -42,3 +42,5 @@ command:
   config-reloaded: "&a設定を再読み込みしました。"
   not-in-battle: "&cボス戦に参加していません。"
   boss-list: "&6利用可能なボス: &f{bosses}"
+  boss-in-use: "&c{boss_name}&rは現在他のプレイヤーが挑戦中です。"
+  boss-disabled: "&cこのボスは現在無効化されています: {boss}"

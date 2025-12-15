@@ -12,6 +12,7 @@ import java.util.Map;
 public class BossConfig {
 
     private final String id;
+    private boolean enabled;
     private String displayName;
     private String mythicMobId;
     private int timeLimit;
@@ -52,6 +53,7 @@ public class BossConfig {
         }
 
         BossConfig boss = new BossConfig(id);
+        boss.enabled = config.getBoolean("enabled", true);
         boss.displayName = config.getString("display-name", id);
         boss.mythicMobId = config.getString("mythic-mob-id", id);
         boss.timeLimit = config.getInt("time-limit", 300);
@@ -106,6 +108,10 @@ public class BossConfig {
     // Getters
     public String getId() {
         return id;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     public String getDisplayName() {

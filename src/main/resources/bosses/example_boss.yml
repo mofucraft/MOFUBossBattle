@@ -4,6 +4,9 @@
 # Internal boss ID (must be unique)
 id: "example_boss"
 
+# Whether this boss is enabled (default: true)
+enabled: true
+
 # Display name for messages (color codes supported)
 display-name: "&c&lドラゴンキング"
 
