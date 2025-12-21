@@ -1,16 +1,19 @@
 package net.mofucraft.bossbattle.battle;
 
 import net.mofucraft.bossbattle.config.BossConfig;
+import org.bukkit.boss.BossBar;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class BattleSession {
 
     private final UUID playerId;
     private final String playerName;
-    private final String bossId;
-    private final BossConfig bossConfig;
+    private String bossId;
+    private BossConfig bossConfig;
 
     private BattleState state;
     private long startTime;
@@ -22,12 +25,25 @@ public class BattleSession {
     // MythicMobs reference
     private UUID activeMobUuid;
 
+    // Boss bar reference
+    private BossBar bossBar;
+
+    // Chain battle tracking
+    private boolean isChainBattle;
+    private List<String> remainingBosses;
+    private int currentBossIndex;
+    private int totalBossCount;
+
     public BattleSession(UUID playerId, String playerName, String bossId, BossConfig bossConfig) {
         this.playerId = playerId;
         this.playerName = playerName;
         this.bossId = bossId;
         this.bossConfig = bossConfig;
         this.state = BattleState.WAITING;
+        this.isChainBattle = false;
+        this.remainingBosses = new ArrayList<>();
+        this.currentBossIndex = 0;
+        this.totalBossCount = 1;
     }
 
     public void start() {
@@ -134,5 +150,72 @@ public class BattleSession {
 
     public void setActiveMobUuid(UUID activeMobUuid) {
         this.activeMobUuid = activeMobUuid;
+    }
+
+    public BossBar getBossBar() {
+        return bossBar;
+    }
+
+    public void setBossBar(BossBar bossBar) {
+        this.bossBar = bossBar;
+    }
+
+    public boolean isChainBattle() {
+        return isChainBattle;
+    }
+
+    public void setChainBattle(boolean chainBattle) {
+        isChainBattle = chainBattle;
+    }
+
+    public List<String> getRemainingBosses() {
+        return remainingBosses;
+    }
+
+    public void setRemainingBosses(List<String> remainingBosses) {
+        this.remainingBosses = remainingBosses;
+    }
+
+    public int getCurrentBossIndex() {
+        return currentBossIndex;
+    }
+
+    public void setCurrentBossIndex(int currentBossIndex) {
+        this.currentBossIndex = currentBossIndex;
+    }
+
+    public int getTotalBossCount() {
+        return totalBossCount;
+    }
+
+    public void setTotalBossCount(int totalBossCount) {
+        this.totalBossCount = totalBossCount;
+    }
+
+    public void setBossId(String bossId) {
+        this.bossId = bossId;
+    }
+
+    public void setBossConfig(BossConfig bossConfig) {
+        this.bossConfig = bossConfig;
+    }
+
+    public void resetStartTime() {
+        this.startTime = System.currentTimeMillis();
+    }
+
+    public boolean hasNextBoss() {
+        return isChainBattle && currentBossIndex < remainingBosses.size();
+    }
+
+    public String getNextBossId() {
+        if (hasNextBoss()) {
+            return remainingBosses.get(currentBossIndex);
+        }
+        return null;
+    }
+
+    public void advanceToNextBoss() {
+        currentBossIndex++;
     }
 }

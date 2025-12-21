@@ -8,6 +8,7 @@ import net.mofucraft.bossbattle.database.DatabaseManager;
 import net.mofucraft.bossbattle.database.RankingRepository;
 import net.mofucraft.bossbattle.hook.MythicMobsHook;
 import net.mofucraft.bossbattle.hook.PlaceholderAPIHook;
+import net.mofucraft.bossbattle.listener.CommandRestrictionListener;
 import net.mofucraft.bossbattle.listener.MythicMobListener;
 import net.mofucraft.bossbattle.listener.PlayerEventListener;
 import org.bukkit.command.PluginCommand;
@@ -67,6 +68,7 @@ public final class MofuBossBattle extends JavaPlugin {
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new PlayerEventListener(this), this);
+        getServer().getPluginManager().registerEvents(new CommandRestrictionListener(this), this);
 
         // Register commands
         PluginCommand bossCommand = getCommand("boss");

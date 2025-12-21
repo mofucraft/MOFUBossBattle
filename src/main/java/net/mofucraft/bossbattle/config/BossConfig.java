@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,17 @@ public class BossConfig {
     private int bossLevel;
     private int bossSpawnDelay;
     private int teleportBlindnessDuration;
+
+    // Survival mode (endurance mode) - player wins when time expires instead of losing
+    private boolean survivalMode;
+
+    // Boss bar settings
+    private boolean showTimeBossBar;
+
+    // Chain battle settings
+    private boolean chainBattleEnabled;
+    private String nextBossId;
+    private List<String> chainBossList;
 
     // Locations
     private Location teleportLocation;
@@ -62,6 +74,24 @@ public class BossConfig {
         boss.bossLevel = config.getInt("boss-level", 1);
         boss.bossSpawnDelay = config.getInt("boss-spawn-delay", 20);
         boss.teleportBlindnessDuration = config.getInt("teleport-blindness-duration", 0);
+
+        // Survival mode (endurance mode)
+        boss.survivalMode = config.getBoolean("survival-mode", false);
+
+        // Boss bar settings
+        boss.showTimeBossBar = config.getBoolean("show-time-bossbar", true);
+
+        // Chain battle settings
+        ConfigurationSection chainSection = config.getConfigurationSection("chain-battle");
+        if (chainSection != null) {
+            boss.chainBattleEnabled = chainSection.getBoolean("enabled", false);
+            boss.nextBossId = chainSection.getString("next-boss", null);
+            boss.chainBossList = chainSection.getStringList("boss-list");
+        } else {
+            boss.chainBattleEnabled = false;
+            boss.nextBossId = null;
+            boss.chainBossList = new ArrayList<>();
+        }
 
         // Load locations
         ConfigurationSection locationsSection = config.getConfigurationSection("locations");
@@ -196,5 +226,25 @@ public class BossConfig {
 
     public List<String> getDefeatCommands() {
         return defeatCommands;
+    }
+
+    public boolean isSurvivalMode() {
+        return survivalMode;
+    }
+
+    public boolean isShowTimeBossBar() {
+        return showTimeBossBar;
+    }
+
+    public boolean isChainBattleEnabled() {
+        return chainBattleEnabled;
+    }
+
+    public String getNextBossId() {
+        return nextBossId;
+    }
+
+    public List<String> getChainBossList() {
+        return chainBossList;
     }
 }

@@ -11,6 +11,10 @@ public class MessageConfig {
     private String battleTimeout;
     private String battleLogout;
     private String battleBossRemoved;
+    private String battleSurvival;
+
+    // Chain battle messages
+    private String chainBattleNextBoss;
 
     // Time warnings
     private String timeWarningDefault;
@@ -19,6 +23,8 @@ public class MessageConfig {
     private String itemCollectionStart;
     private String itemCollectionWarning;
     private String itemCollectionEnd;
+    private String itemCollectionLeaveHint;
+    private String itemCollectionLeaveHover;
 
     // Ranking
     private String rankingHeader;
@@ -39,6 +45,9 @@ public class MessageConfig {
     private String commandBossList;
     private String commandBossInUse;
     private String commandBossDisabled;
+    private String commandLeaveNotAllowed;
+    private String commandLeaveSuccess;
+    private String commandBlocked;
 
     // Prefix
     private String prefix;
@@ -51,6 +60,10 @@ public class MessageConfig {
         battleTimeout = config.getString("battle.timeout", "&c時間切れ！{boss_name}&rとの戦闘に失敗しました。");
         battleLogout = config.getString("battle.logout", "&c{player}&rがログアウトしたため、戦闘が終了しました。");
         battleBossRemoved = config.getString("battle.boss-removed", "&c{boss_name}&rが消滅したため、戦闘が終了しました。");
+        battleSurvival = config.getString("battle.survival", "&6おめでとう！ &e{boss_name}&rを&a{time}&r耐え抜きました！");
+
+        // Chain battle messages
+        chainBattleNextBoss = config.getString("chain-battle.next-boss", "&e次のボス: &c{boss_name}&rが出現！ ({current_boss}/{total_bosses})");
 
         // Time warnings
         timeWarningDefault = config.getString("time-warnings.default", "&e残り時間: &c{time}秒");
@@ -59,6 +72,8 @@ public class MessageConfig {
         itemCollectionStart = config.getString("item-collection.start", "&aボスを討伐しました！&e{time}秒&r以内にアイテムを回収してください。");
         itemCollectionWarning = config.getString("item-collection.warning", "&e残り&c{time}秒&rでアイテム回収時間が終了します。");
         itemCollectionEnd = config.getString("item-collection.end", "&rアイテム回収時間が終了しました。");
+        itemCollectionLeaveHint = config.getString("item-collection.leave-hint", "&7[&a/boss leave&7] をクリックして今すぐ離脱");
+        itemCollectionLeaveHover = config.getString("item-collection.leave-hover", "&eクリックして離脱コマンドを実行");
 
         // Ranking (use {boss_name_plain} for color-stripped name, {boss_name} for colored)
         rankingHeader = config.getString("ranking.header", "&6=== {boss_name_plain} ランキング ===");
@@ -79,6 +94,9 @@ public class MessageConfig {
         commandBossList = config.getString("command.boss-list", "&6利用可能なボス: &f{bosses}");
         commandBossInUse = config.getString("command.boss-in-use", "&c{boss_name}&rは現在他のプレイヤーが挑戦中です。");
         commandBossDisabled = config.getString("command.boss-disabled", "&cこのボスは現在無効化されています: {boss}");
+        commandLeaveNotAllowed = config.getString("command.leave-not-allowed", "&cアイテム回収時間中のみ離脱できます。");
+        commandLeaveSuccess = config.getString("command.leave-success", "&a離脱しました。");
+        commandBlocked = config.getString("command.blocked", "&cボス戦中はこのコマンドを使用できません。");
 
         // Prefix
         prefix = config.getString("prefix", "&8[&6MofuBossBattle&8] ");
@@ -109,6 +127,14 @@ public class MessageConfig {
         return battleBossRemoved;
     }
 
+    public String getBattleSurvival() {
+        return battleSurvival;
+    }
+
+    public String getChainBattleNextBoss() {
+        return chainBattleNextBoss;
+    }
+
     public String getTimeWarningDefault() {
         return timeWarningDefault;
     }
@@ -123,6 +149,14 @@ public class MessageConfig {
 
     public String getItemCollectionEnd() {
         return itemCollectionEnd;
+    }
+
+    public String getItemCollectionLeaveHint() {
+        return itemCollectionLeaveHint;
+    }
+
+    public String getItemCollectionLeaveHover() {
+        return itemCollectionLeaveHover;
     }
 
     public String getRankingHeader() {
@@ -187,6 +221,18 @@ public class MessageConfig {
 
     public String getCommandBossDisabled() {
         return commandBossDisabled;
+    }
+
+    public String getCommandLeaveNotAllowed() {
+        return commandLeaveNotAllowed;
+    }
+
+    public String getCommandLeaveSuccess() {
+        return commandLeaveSuccess;
+    }
+
+    public String getCommandBlocked() {
+        return commandBlocked;
     }
 
     public String getPrefix() {

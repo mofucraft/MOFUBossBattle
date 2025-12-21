@@ -1,5 +1,5 @@
 name: MofuBossBattle
-version: '${version}'
+version: '0.0.2'
 main: net.mofucraft.bossbattle.MofuBossBattle
 api-version: '1.21'
 authors:
@@ -13,7 +13,7 @@ softdepend:
 commands:
   boss:
     description: Main boss battle command
-    usage: /<command> <start|stop|list|ranking|myrank|reload|help>
+    usage: /<command> <start|stop|leave|list|ranking|myrank|reload|help>
     permission: mofubossbattle.use
 
 permissions:
@@ -47,6 +47,9 @@ permissions:
   mofubossbattle.admin:
     description: Full admin access
     default: op
+  mofubossbattle.bypass.commands:
+    description: Bypass command restriction during battle
+    default: op
   mofubossbattle.*:
     description: All permissions
     default: op
@@ -61,3 +64,4 @@ permissions:
       mofubossbattle.myrank: true
       mofubossbattle.reload: true
       mofubossbattle.admin: true
+      mofubossbattle.bypass.commands: true

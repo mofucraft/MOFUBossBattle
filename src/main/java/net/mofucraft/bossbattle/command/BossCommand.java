@@ -44,6 +44,8 @@ public class BossCommand implements CommandExecutor {
                 return handleStart(sender, args, messages);
             case "stop":
                 return handleStop(sender, args, messages);
+            case "leave":
+                return handleLeave(sender, messages);
             case "list":
                 return handleList(sender, messages);
             case "ranking":
@@ -63,7 +65,11 @@ public class BossCommand implements CommandExecutor {
 
     private boolean handleStart(CommandSender sender, String[] args, MessageConfig messages) {
         if (!sender.hasPermission("mofubossbattle.start")) {
-            MessageUtil.sendMessage((Player) sender, messages.withPrefix(messages.getCommandNoPermission()));
+            if (sender instanceof Player) {
+                MessageUtil.sendMessage((Player) sender, messages.withPrefix(messages.getCommandNoPermission()));
+            } else {
+                sender.sendMessage("You don't have permission to use this command.");
+            }
             return true;
         }
 
@@ -132,6 +138,8 @@ public class BossCommand implements CommandExecutor {
         if (!sender.hasPermission("mofubossbattle.stop")) {
             if (sender instanceof Player) {
                 MessageUtil.sendMessage((Player) sender, messages.withPrefix(messages.getCommandNoPermission()));
+            } else {
+                sender.sendMessage("You don't have permission to use this command.");
             }
             return true;
         }
@@ -158,6 +166,31 @@ public class BossCommand implements CommandExecutor {
 
         plugin.getBattleManager().forceEndBattle(target.getUniqueId());
         MessageUtil.sendMessage(target, messages.withPrefix(messages.getCommandBattleStopped()));
+
+        return true;
+    }
+
+    private boolean handleLeave(CommandSender sender, MessageConfig messages) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(messages.getCommandPlayerOnly());
+            return true;
+        }
+
+        BattleSession session = plugin.getBattleManager().getSession(player.getUniqueId());
+        if (session == null) {
+            MessageUtil.sendMessage(player, messages.withPrefix(messages.getCommandNotInBattle()));
+            return true;
+        }
+
+        // Only allow leave during item collection phase
+        if (session.getState() != net.mofucraft.bossbattle.battle.BattleState.ITEM_COLLECTION) {
+            MessageUtil.sendMessage(player, messages.withPrefix(messages.getCommandLeaveNotAllowed()));
+            return true;
+        }
+
+        // End battle and teleport to exit
+        plugin.getBattleManager().endBattle(player.getUniqueId(), net.mofucraft.bossbattle.battle.BattleState.COMPLETED);
+        MessageUtil.sendMessage(player, messages.withPrefix(messages.getCommandLeaveSuccess()));
 
         return true;
     }
@@ -411,6 +444,7 @@ public class BossCommand implements CommandExecutor {
         sender.sendMessage("§6=== MofuBossBattle Commands ===");
         sender.sendMessage("§e/boss start <boss_id> [player] §7- Start a boss battle");
         sender.sendMessage("§e/boss stop [player] §7- Stop a boss battle");
+        sender.sendMessage("§e/boss leave §7- Leave during item collection");
         sender.sendMessage("§e/boss list §7- List available bosses");
         sender.sendMessage("§e/boss ranking <boss_id> §7- View rankings");
         sender.sendMessage("§e/boss myrank <boss_id> §7- View your rank");

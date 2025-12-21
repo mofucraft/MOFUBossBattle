@@ -38,16 +38,24 @@ public class BattleTimerTask extends BukkitRunnable {
         }
 
         int remainingSeconds = session.getRemainingSeconds();
+        BossConfig bossConfig = session.getBossConfig();
+
+        // Update boss bar
+        plugin.getBattleManager().updateBossBar(session);
 
         // Check timeout
         if (remainingSeconds <= 0) {
-            plugin.getBattleManager().onTimeout(session.getPlayerId());
+            // In survival mode, time expiration means victory
+            if (bossConfig.isSurvivalMode()) {
+                plugin.getBattleManager().onSurvivalTimeComplete(session.getPlayerId());
+            } else {
+                plugin.getBattleManager().onTimeout(session.getPlayerId());
+            }
             cancel();
             return;
         }
 
         // Check for time warnings
-        BossConfig bossConfig = session.getBossConfig();
         Map<Integer, String> warnings = bossConfig.getTimeWarnings();
 
         if (warnings != null && warnings.containsKey(remainingSeconds) && remainingSeconds != lastWarningSecond) {

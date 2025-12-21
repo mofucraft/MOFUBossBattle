@@ -17,7 +17,7 @@ public class BossTabCompleter implements TabCompleter {
 
     private final MofuBossBattle plugin;
     private static final List<String> SUBCOMMANDS = Arrays.asList(
-            "start", "stop", "list", "ranking", "myrank", "resetranking", "reload", "help"
+            "start", "stop", "leave", "list", "ranking", "myrank", "resetranking", "reload", "help"
     );
 
     public BossTabCompleter(MofuBossBattle plugin) {

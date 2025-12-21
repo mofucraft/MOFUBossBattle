@@ -35,6 +35,14 @@ public class ConfigManager {
     private boolean enabled;
     private boolean debug;
 
+    // Battle command restriction settings
+    private boolean commandRestrictionEnabled;
+    private java.util.List<String> allowedCommands;
+    private String commandRestrictionBypassPermission;
+
+    // Item collection leave settings
+    private boolean showLeaveCommandInChat;
+
     public ConfigManager(MofuBossBattle plugin) {
         this.plugin = plugin;
         this.bossConfigs = new HashMap<>();
@@ -77,6 +85,14 @@ public class ConfigManager {
         defaultItemCollectionTime = config.getInt("settings.default-item-collection-time", 30);
         enabled = config.getBoolean("settings.enabled", true);
         debug = config.getBoolean("debug", false);
+
+        // Command restriction settings
+        commandRestrictionEnabled = config.getBoolean("battle.command-restriction.enabled", true);
+        allowedCommands = config.getStringList("battle.command-restriction.allowed-commands");
+        commandRestrictionBypassPermission = config.getString("battle.command-restriction.bypass-permission", "mofubossbattle.bypass.commands");
+
+        // Item collection settings
+        showLeaveCommandInChat = config.getBoolean("battle.item-collection.show-leave-command", true);
     }
 
     private void loadMessages() {
@@ -208,5 +224,21 @@ public class ConfigManager {
 
     public boolean isDebug() {
         return debug;
+    }
+
+    public boolean isCommandRestrictionEnabled() {
+        return commandRestrictionEnabled;
+    }
+
+    public java.util.List<String> getAllowedCommands() {
+        return allowedCommands;
+    }
+
+    public String getCommandRestrictionBypassPermission() {
+        return commandRestrictionBypassPermission;
+    }
+
+    public boolean isShowLeaveCommandInChat() {
+        return showLeaveCommandInChat;
     }
 }

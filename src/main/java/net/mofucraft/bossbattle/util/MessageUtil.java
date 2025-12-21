@@ -1,6 +1,8 @@
 package net.mofucraft.bossbattle.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
@@ -52,6 +54,16 @@ public final class MessageUtil {
         return message.replaceAll("[&§][0-9a-fk-or]", "");
     }
 
+    /**
+     * Convert legacy color codes (&x) to section codes (§x) for use in BossBar, etc.
+     */
+    public static String colorize(String message) {
+        if (message == null) {
+            return null;
+        }
+        return message.replace('&', '§');
+    }
+
     public static void sendMessage(Player player, String message) {
         if (player != null && message != null && !message.isEmpty()) {
             player.sendMessage(parse(message));
@@ -89,5 +101,20 @@ public final class MessageUtil {
         if (player != null && message != null && !message.isEmpty()) {
             player.sendActionBar(parse(message, placeholders));
         }
+    }
+
+    /**
+     * Send a clickable command message to a player
+     */
+    public static void sendClickableCommand(Player player, String message, String command, String hoverText) {
+        if (player == null || message == null || message.isEmpty()) {
+            return;
+        }
+
+        Component component = parse(message)
+                .clickEvent(ClickEvent.runCommand(command))
+                .hoverEvent(HoverEvent.showText(parse(hoverText != null ? hoverText : command)));
+
+        player.sendMessage(component);
     }
 }

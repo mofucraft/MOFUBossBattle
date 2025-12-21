@@ -1,4 +1,5 @@
 # MofuBossBattle Configuration
+# Version: 0.0.2
 
 # Database settings (MySQL)
 database:
@@ -22,6 +23,27 @@ settings:
 
   # Allow players to start boss battles
   enabled: true
+
+# Battle settings
+battle:
+  # Command restriction during battle
+  command-restriction:
+    # Enable/disable command restriction during boss battle
+    enabled: true
+    # Commands that are allowed during battle (without leading slash)
+    # "boss" command is always allowed
+    allowed-commands:
+      - "msg"
+      - "r"
+      - "tell"
+      - "w"
+    # Permission to bypass command restriction
+    bypass-permission: "mofubossbattle.bypass.commands"
+
+  # Item collection phase settings
+  item-collection:
+    # Show clickable leave command in chat after boss defeat
+    show-leave-command: true
 
 # Debug mode - enables verbose logging
 debug: false
