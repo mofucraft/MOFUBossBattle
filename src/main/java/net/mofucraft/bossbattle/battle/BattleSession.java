@@ -12,6 +12,7 @@ public class BattleSession {
 
     private final UUID playerId;
     private final String playerName;
+    private final String initialBossId; // First boss ID for chain battle tracking
     private String bossId;
     private BossConfig bossConfig;
 
@@ -21,6 +22,7 @@ public class BattleSession {
 
     private BukkitTask timerTask;
     private BukkitTask itemCollectionTask;
+    private BukkitTask soundLoopTask;
 
     // MythicMobs reference
     private UUID activeMobUuid;
@@ -37,6 +39,7 @@ public class BattleSession {
     public BattleSession(UUID playerId, String playerName, String bossId, BossConfig bossConfig) {
         this.playerId = playerId;
         this.playerName = playerName;
+        this.initialBossId = bossId;
         this.bossId = bossId;
         this.bossConfig = bossConfig;
         this.state = BattleState.WAITING;
@@ -44,6 +47,10 @@ public class BattleSession {
         this.remainingBosses = new ArrayList<>();
         this.currentBossIndex = 0;
         this.totalBossCount = 1;
+    }
+
+    public String getInitialBossId() {
+        return initialBossId;
     }
 
     public void start() {
@@ -65,6 +72,10 @@ public class BattleSession {
         if (itemCollectionTask != null && !itemCollectionTask.isCancelled()) {
             itemCollectionTask.cancel();
             itemCollectionTask = null;
+        }
+        if (soundLoopTask != null && !soundLoopTask.isCancelled()) {
+            soundLoopTask.cancel();
+            soundLoopTask = null;
         }
     }
 
@@ -142,6 +153,14 @@ public class BattleSession {
 
     public void setItemCollectionTask(BukkitTask itemCollectionTask) {
         this.itemCollectionTask = itemCollectionTask;
+    }
+
+    public BukkitTask getSoundLoopTask() {
+        return soundLoopTask;
+    }
+
+    public void setSoundLoopTask(BukkitTask soundLoopTask) {
+        this.soundLoopTask = soundLoopTask;
     }
 
     public UUID getActiveMobUuid() {

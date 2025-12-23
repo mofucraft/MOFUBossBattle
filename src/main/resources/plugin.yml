@@ -1,5 +1,5 @@
 name: MofuBossBattle
-version: '0.0.2'
+version: '1.0.0'
 main: net.mofucraft.bossbattle.MofuBossBattle
 api-version: '1.21'
 authors:
@@ -22,13 +22,13 @@ permissions:
     default: true
   mofubossbattle.start:
     description: Allows starting boss battles
-    default: true
+    default: op
   mofubossbattle.start.others:
     description: Allows starting boss battles for other players
     default: op
   mofubossbattle.stop:
     description: Allows stopping own boss battles
-    default: true
+    default: op
   mofubossbattle.stop.others:
     description: Allows stopping other players' battles
     default: op

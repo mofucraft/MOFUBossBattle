@@ -2,6 +2,11 @@ package net.mofucraft.bossbattle.config;
 
 import net.mofucraft.bossbattle.util.LocationUtil;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -28,6 +33,24 @@ public class BossConfig {
 
     // Boss bar settings
     private boolean showTimeBossBar;
+    private BarColor bossBarColor;
+    private BarStyle bossBarStyle;
+    private String bossBarTitleFormat;
+
+    // Sound settings
+    private Sound battleStartSound;
+    private float battleStartSoundVolume;
+    private float battleStartSoundPitch;
+    private Sound battleLoopSound;
+    private float battleLoopSoundVolume;
+    private float battleLoopSoundPitch;
+    private int battleLoopSoundInterval; // in ticks
+    private Sound victorySound;
+    private float victorySoundVolume;
+    private float victorySoundPitch;
+    private Sound defeatSound;
+    private float defeatSoundVolume;
+    private float defeatSoundPitch;
 
     // Chain battle settings
     private boolean chainBattleEnabled;
@@ -80,6 +103,48 @@ public class BossConfig {
 
         // Boss bar settings
         boss.showTimeBossBar = config.getBoolean("show-time-bossbar", true);
+        ConfigurationSection bossBarSection = config.getConfigurationSection("bossbar");
+        if (bossBarSection != null) {
+            boss.bossBarColor = parseBarColor(bossBarSection.getString("color", "RED"));
+            boss.bossBarStyle = parseBarStyle(bossBarSection.getString("style", "SOLID"));
+            boss.bossBarTitleFormat = bossBarSection.getString("title-format", "&c{boss_name} &7[{mode}] &e{time}");
+        } else {
+            boss.bossBarColor = BarColor.RED;
+            boss.bossBarStyle = BarStyle.SOLID;
+            boss.bossBarTitleFormat = "&c{boss_name} &7[{mode}] &e{time}";
+        }
+
+        // Sound settings
+        ConfigurationSection soundSection = config.getConfigurationSection("sounds");
+        if (soundSection != null) {
+            boss.battleStartSound = parseSound(soundSection.getString("battle-start.sound"));
+            boss.battleStartSoundVolume = (float) soundSection.getDouble("battle-start.volume", 1.0);
+            boss.battleStartSoundPitch = (float) soundSection.getDouble("battle-start.pitch", 1.0);
+
+            boss.battleLoopSound = parseSound(soundSection.getString("battle-loop.sound"));
+            boss.battleLoopSoundVolume = (float) soundSection.getDouble("battle-loop.volume", 1.0);
+            boss.battleLoopSoundPitch = (float) soundSection.getDouble("battle-loop.pitch", 1.0);
+            boss.battleLoopSoundInterval = soundSection.getInt("battle-loop.interval", 100); // 5 seconds default
+
+            boss.victorySound = parseSound(soundSection.getString("victory.sound"));
+            boss.victorySoundVolume = (float) soundSection.getDouble("victory.volume", 1.0);
+            boss.victorySoundPitch = (float) soundSection.getDouble("victory.pitch", 1.0);
+
+            boss.defeatSound = parseSound(soundSection.getString("defeat.sound"));
+            boss.defeatSoundVolume = (float) soundSection.getDouble("defeat.volume", 1.0);
+            boss.defeatSoundPitch = (float) soundSection.getDouble("defeat.pitch", 1.0);
+        } else {
+            // Defaults
+            boss.battleStartSoundVolume = 1.0f;
+            boss.battleStartSoundPitch = 1.0f;
+            boss.battleLoopSoundVolume = 1.0f;
+            boss.battleLoopSoundPitch = 1.0f;
+            boss.battleLoopSoundInterval = 100;
+            boss.victorySoundVolume = 1.0f;
+            boss.victorySoundPitch = 1.0f;
+            boss.defeatSoundVolume = 1.0f;
+            boss.defeatSoundPitch = 1.0f;
+        }
 
         // Chain battle settings
         ConfigurationSection chainSection = config.getConfigurationSection("chain-battle");
@@ -246,5 +311,115 @@ public class BossConfig {
 
     public List<String> getChainBossList() {
         return chainBossList;
+    }
+
+    public BarColor getBossBarColor() {
+        return bossBarColor;
+    }
+
+    public BarStyle getBossBarStyle() {
+        return bossBarStyle;
+    }
+
+    public String getBossBarTitleFormat() {
+        return bossBarTitleFormat;
+    }
+
+    public Sound getBattleStartSound() {
+        return battleStartSound;
+    }
+
+    public float getBattleStartSoundVolume() {
+        return battleStartSoundVolume;
+    }
+
+    public float getBattleStartSoundPitch() {
+        return battleStartSoundPitch;
+    }
+
+    public Sound getBattleLoopSound() {
+        return battleLoopSound;
+    }
+
+    public float getBattleLoopSoundVolume() {
+        return battleLoopSoundVolume;
+    }
+
+    public float getBattleLoopSoundPitch() {
+        return battleLoopSoundPitch;
+    }
+
+    public int getBattleLoopSoundInterval() {
+        return battleLoopSoundInterval;
+    }
+
+    public Sound getVictorySound() {
+        return victorySound;
+    }
+
+    public float getVictorySoundVolume() {
+        return victorySoundVolume;
+    }
+
+    public float getVictorySoundPitch() {
+        return victorySoundPitch;
+    }
+
+    public Sound getDefeatSound() {
+        return defeatSound;
+    }
+
+    public float getDefeatSoundVolume() {
+        return defeatSoundVolume;
+    }
+
+    public float getDefeatSoundPitch() {
+        return defeatSoundPitch;
+    }
+
+    // Helper methods for parsing
+    private static BarColor parseBarColor(String colorStr) {
+        if (colorStr == null) return BarColor.RED;
+        try {
+            return BarColor.valueOf(colorStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return BarColor.RED;
+        }
+    }
+
+    private static BarStyle parseBarStyle(String styleStr) {
+        if (styleStr == null) return BarStyle.SOLID;
+        try {
+            return BarStyle.valueOf(styleStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return BarStyle.SOLID;
+        }
+    }
+
+    private static Sound parseSound(String soundStr) {
+        if (soundStr == null || soundStr.isEmpty()) return null;
+        try {
+            // Convert ENTITY_ENDER_DRAGON_GROWL format to entity.ender_dragon.growl
+            String key = soundStr.toLowerCase().replace("_", ".");
+            // Handle minecraft: prefix
+            if (!key.contains(":")) {
+                key = "minecraft:" + key;
+            }
+            NamespacedKey namespacedKey = NamespacedKey.fromString(key);
+            if (namespacedKey != null) {
+                Sound sound = Registry.SOUNDS.get(namespacedKey);
+                if (sound != null) {
+                    return sound;
+                }
+            }
+            // Fallback: try direct namespaced key without conversion
+            NamespacedKey directKey = NamespacedKey.fromString(soundStr.toLowerCase());
+            if (directKey != null) {
+                return Registry.SOUNDS.get(directKey);
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

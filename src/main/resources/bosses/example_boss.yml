@@ -1,5 +1,5 @@
 # Boss Configuration: Example Boss
-# Version: 0.0.2
+# Version: 1.0.0
 # このファイルをコピーして新しいボスを作成してください
 
 # Internal boss ID (must be unique)
@@ -26,6 +26,41 @@ survival-mode: false
 
 # Show remaining time in boss bar (default: true)
 show-time-bossbar: true
+
+# Boss bar customization (optional)
+bossbar:
+  # Color: BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW
+  color: "RED"
+  # Style: SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+  style: "SOLID"
+  # Title format placeholders: {boss_name}, {mode}, {time}
+  title-format: "&c{boss_name} &7[{mode}] &e{time}"
+
+# Sound settings (optional)
+# Use Minecraft sound names like: entity.ender_dragon.growl, entity.wither.spawn
+# Full list: https://minecraft.wiki/w/Sounds.json
+sounds:
+  # Sound when battle starts
+  battle-start:
+    sound: "entity.ender_dragon.growl"
+    volume: 1.0
+    pitch: 1.0
+  # Looping sound during battle (optional)
+  battle-loop:
+    sound: ""
+    volume: 0.5
+    pitch: 1.0
+    interval: 100  # Interval in ticks (20 ticks = 1 second)
+  # Sound when player wins
+  victory:
+    sound: "ui.toast.challenge_complete"
+    volume: 1.0
+    pitch: 1.0
+  # Sound when player loses
+  defeat:
+    sound: "entity.wither.death"
+    volume: 1.0
+    pitch: 0.5
 
 # Item collection time after boss defeat in seconds (default: 30)
 item-collection-time: 45

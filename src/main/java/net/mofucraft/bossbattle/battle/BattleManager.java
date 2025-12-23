@@ -9,14 +9,15 @@ import net.mofucraft.bossbattle.util.MessageUtil;
 import net.mofucraft.bossbattle.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,6 +73,10 @@ public class BattleManager {
                 session.setRemainingBosses(new ArrayList<>(chainList));
                 session.setTotalBossCount(chainList.size() + 1); // Include current boss
                 session.setCurrentBossIndex(0);
+                // Mark all chain bosses as in use
+                for (String chainBossId : chainList) {
+                    activeBosses.add(chainBossId);
+                }
             }
         }
 
@@ -141,6 +146,19 @@ public class BattleManager {
 
         MessageUtil.sendMessage(player, messages.withPrefix(startMsg), placeholders);
 
+        // Play battle start sound
+        playBattleStartSound(player, bossConfig);
+
+        // Start sound loop task if configured
+        if (bossConfig.getBattleLoopSound() != null && bossConfig.getBattleLoopSoundInterval() > 0) {
+            BukkitTask soundTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                if (session.isInBattle()) {
+                    playBattleLoopSound(session);
+                }
+            }, bossConfig.getBattleLoopSoundInterval(), bossConfig.getBattleLoopSoundInterval());
+            session.setSoundLoopTask(soundTask);
+        }
+
         // Start timer task
         BattleTimerTask timerTask = new BattleTimerTask(plugin, session);
         session.setTimerTask(timerTask.runTaskTimer(plugin, 20L, 20L));
@@ -154,12 +172,21 @@ public class BattleManager {
 
     private void createBossBar(Player player, BattleSession session) {
         BossConfig bossConfig = session.getBossConfig();
-        String title = MessageUtil.colorize("&c" + MessageUtil.stripColors(bossConfig.getDisplayName()) +
-                " &7- &e" + TimeUtil.formatSecondsReadable(bossConfig.getTimeLimit()));
-        BossBar bossBar = Bukkit.createBossBar(title, BarColor.RED, BarStyle.SOLID);
+        String modeText = bossConfig.isSurvivalMode() ? "&a耐久" : "&c制限";
+        String title = formatBossBarTitle(bossConfig, modeText, TimeUtil.formatSecondsReadable(bossConfig.getTimeLimit()));
+        BossBar bossBar = Bukkit.createBossBar(title, bossConfig.getBossBarColor(), bossConfig.getBossBarStyle());
         bossBar.setProgress(1.0);
         bossBar.addPlayer(player);
         session.setBossBar(bossBar);
+    }
+
+    private String formatBossBarTitle(BossConfig bossConfig, String modeText, String timeText) {
+        String format = bossConfig.getBossBarTitleFormat();
+        String title = format
+                .replace("{boss_name}", MessageUtil.stripColors(bossConfig.getDisplayName()))
+                .replace("{mode}", modeText)
+                .replace("{time}", timeText);
+        return MessageUtil.colorize(title);
     }
 
     public void updateBossBar(BattleSession session) {
@@ -174,17 +201,16 @@ public class BattleManager {
         bossBar.setProgress(progress);
 
         String modeText = bossConfig.isSurvivalMode() ? "&a耐久" : "&c制限";
-        String title = MessageUtil.colorize("&c" + MessageUtil.stripColors(bossConfig.getDisplayName()) +
-                " &7[" + modeText + "&7] &e" + TimeUtil.formatSecondsReadable(remaining));
+        String title = formatBossBarTitle(bossConfig, modeText, TimeUtil.formatSecondsReadable(remaining));
         bossBar.setTitle(title);
 
-        // Change color based on remaining time
+        // Change color based on remaining time (dynamic color change)
         if (remaining <= 30) {
             bossBar.setColor(BarColor.RED);
         } else if (remaining <= 60) {
             bossBar.setColor(BarColor.YELLOW);
         } else {
-            bossBar.setColor(BarColor.GREEN);
+            bossBar.setColor(bossConfig.getBossBarColor());
         }
     }
 
@@ -246,6 +272,9 @@ public class BattleManager {
         placeholders.put("time_ms", String.valueOf(clearTime));
 
         MessageUtil.sendMessage(player, messages.withPrefix(victoryMsg), placeholders);
+
+        // Play victory sound
+        playVictorySound(player, bossConfig);
 
         // Send victory broadcast
         String victoryBroadcast = bossConfig.getVictoryBroadcast();
@@ -326,6 +355,9 @@ public class BattleManager {
         placeholders.put("time_ms", String.valueOf(survivalTime));
 
         MessageUtil.sendMessage(player, messages.withPrefix(survivalMsg), placeholders);
+
+        // Play victory sound
+        playVictorySound(player, bossConfig);
 
         // Send victory broadcast
         String victoryBroadcast = bossConfig.getVictoryBroadcast();
@@ -417,6 +449,19 @@ public class BattleManager {
         placeholders.put("total_bosses", String.valueOf(session.getTotalBossCount()));
 
         MessageUtil.sendMessage(player, messages.withPrefix(startMsg), placeholders);
+
+        // Play battle start sound for next boss
+        playBattleStartSound(player, nextBossConfig);
+
+        // Start sound loop task if configured for new boss
+        if (nextBossConfig.getBattleLoopSound() != null && nextBossConfig.getBattleLoopSoundInterval() > 0) {
+            BukkitTask soundTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                if (session.isInBattle()) {
+                    playBattleLoopSound(session);
+                }
+            }, nextBossConfig.getBattleLoopSoundInterval(), nextBossConfig.getBattleLoopSoundInterval());
+            session.setSoundLoopTask(soundTask);
+        }
 
         // Start new timer task
         BattleTimerTask timerTask = new BattleTimerTask(plugin, session);
@@ -552,6 +597,9 @@ public class BattleManager {
         if (player != null) {
             MessageUtil.sendMessage(player, messages.withPrefix(message), placeholders);
 
+            // Play defeat sound
+            playDefeatSound(player, bossConfig);
+
             // Kill player for timeout (damage from boss)
             if (resultType == BattleResult.ResultType.TIMEOUT) {
                 // Try to get boss entity and deal damage from it
@@ -602,8 +650,13 @@ public class BattleManager {
         // Remove boss bar
         removeBossBar(session);
 
-        // Release boss for other players
-        activeBosses.remove(session.getBossId());
+        // Release boss for other players - remove initial boss and all chain bosses
+        activeBosses.remove(session.getInitialBossId());
+        if (session.isChainBattle()) {
+            for (String chainBossId : session.getRemainingBosses()) {
+                activeBosses.remove(chainBossId);
+            }
+        }
 
         session.end(endState);
 
@@ -692,5 +745,40 @@ public class BattleManager {
         for (Player p : Bukkit.getOnlinePlayers()) {
             MessageUtil.sendMessage(p, message, placeholders);
         }
+    }
+
+    // Sound methods
+    private void playSound(Player player, Sound sound, float volume, float pitch) {
+        if (player != null && sound != null) {
+            player.playSound(player.getLocation(), sound, volume, pitch);
+        }
+    }
+
+    private void playBattleStartSound(Player player, BossConfig bossConfig) {
+        playSound(player, bossConfig.getBattleStartSound(),
+                bossConfig.getBattleStartSoundVolume(), bossConfig.getBattleStartSoundPitch());
+    }
+
+    private void playVictorySound(Player player, BossConfig bossConfig) {
+        playSound(player, bossConfig.getVictorySound(),
+                bossConfig.getVictorySoundVolume(), bossConfig.getVictorySoundPitch());
+    }
+
+    private void playDefeatSound(Player player, BossConfig bossConfig) {
+        playSound(player, bossConfig.getDefeatSound(),
+                bossConfig.getDefeatSoundVolume(), bossConfig.getDefeatSoundPitch());
+    }
+
+    public void playBattleLoopSound(BattleSession session) {
+        Player player = Bukkit.getPlayer(session.getPlayerId());
+        BossConfig bossConfig = session.getBossConfig();
+        if (player != null && bossConfig.getBattleLoopSound() != null) {
+            playSound(player, bossConfig.getBattleLoopSound(),
+                    bossConfig.getBattleLoopSoundVolume(), bossConfig.getBattleLoopSoundPitch());
+        }
+    }
+
+    public int getBattleLoopSoundInterval(BattleSession session) {
+        return session.getBossConfig().getBattleLoopSoundInterval();
     }
 }
